@@ -1,10 +1,12 @@
 package br.com.gklein.userserviceapi.service;
 
+import br.com.gklein.userserviceapi.entity.User;
 import br.com.gklein.userserviceapi.mapper.UserMapper;
 import br.com.gklein.userserviceapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import models.exceptions.ResourceNotFoundException;
 import models.requests.CreateUserRequest;
+import models.requests.UpdateUserRequest;
 import models.responses.UserResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -19,12 +21,7 @@ public class UserService {
     private final UserMapper mapper;
 
     public UserResponse findById(final String id) {
-        return mapper.fromEntity(
-                repository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Object not found. Id: " + id + " type: " + UserResponse.class.getSimpleName()
-                        ))
-        );
+        return mapper.fromEntity(find(id));
     }
 
     public void save(CreateUserRequest request) {
@@ -37,6 +34,21 @@ public class UserService {
         return repository.findAll()
                 .stream().map(mapper::fromEntity)
                 .toList();
+    }
+
+    public UserResponse update(final String id, final UpdateUserRequest request) {
+        User entity = find(id);
+        verifyIfEmailAlreadyExists(request.email(), id);
+        return mapper.fromEntity(
+                repository.save(mapper.update(request, entity))
+        );
+    }
+
+    private User find(final String id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Object not found. Id: " + id + ", Type: " + UserResponse.class.getSimpleName()
+                ));
     }
 
     private void verifyIfEmailAlreadyExists(final String email, final String id) {

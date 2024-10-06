@@ -3,6 +3,7 @@ package br.com.gklein.userserviceapi.service;
 import br.com.gklein.userserviceapi.entity.User;
 import br.com.gklein.userserviceapi.mapper.UserMapper;
 import br.com.gklein.userserviceapi.repository.UserRepository;
+import models.exceptions.ResourceNotFoundException;
 import models.responses.UserResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -47,4 +48,18 @@ class UserServiceTest {
         verify(mapper).fromEntity(any(User.class));
     }
 
+    @Test
+    void whenCallFindByIdWithInvalidIdThenThrowResourceNotFoundException() {
+        when(repository.findById(anyString())).thenReturn(Optional.empty());
+
+        try {
+            service.findById("1");
+        } catch (Exception e) {
+            assertEquals(ResourceNotFoundException.class, e.getClass());
+            assertEquals("Object not found. Id: 1, Type: UserResponse", e.getMessage());
+        }
+
+        verify(repository).findById(anyString());
+        verify(mapper, times(0)).fromEntity(any(User.class));
+    }
 }

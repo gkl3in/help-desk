@@ -4,6 +4,7 @@ import br.com.gklein.userserviceapi.entity.User;
 import br.com.gklein.userserviceapi.mapper.UserMapper;
 import br.com.gklein.userserviceapi.repository.UserRepository;
 import models.exceptions.ResourceNotFoundException;
+import models.requests.CreateUserRequest;
 import models.responses.UserResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -77,5 +78,22 @@ class UserServiceTest {
 
         verify(repository, times(1)).findAll();
         verify(mapper, times(2)).fromEntity(any(User.class));
+    }
+
+    @Test
+    void whenCallSaveThenSuccess() {
+        final var request = generateMock(CreateUserRequest.class);
+
+        when(mapper.fromRequest(any())).thenReturn(new User());
+        when(encoder.encode(anyString())).thenReturn("encoded");
+        when(repository.save(any(User.class))).thenReturn(new User());
+        when(repository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        service.save(request);
+
+        verify(mapper).fromRequest(request);
+        verify(encoder).encode(request.password());
+        verify(repository).save(any(User.class));
+        verify(repository).findByEmail(request.email());
     }
 }

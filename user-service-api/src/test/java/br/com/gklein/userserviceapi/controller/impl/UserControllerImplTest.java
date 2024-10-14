@@ -3,6 +3,8 @@ package br.com.gklein.userserviceapi.controller.impl;
 
 import br.com.gklein.userserviceapi.entity.User;
 import br.com.gklein.userserviceapi.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import models.requests.CreateUserRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import java.util.List;
 
 import static br.com.gklein.userserviceapi.creator.CreatorUtils.generateMock;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -81,5 +84,27 @@ class UserControllerImplTest {
                 .andExpect(jsonPath("$[0].profiles").isArray());
 
         userRepository.deleteAll(List.of(entity1, entity2));
+    }
+
+    @Test
+    @DisplayName("Should save a user with success")
+    void testSaveUserWithSuccess() throws Exception {
+        final var request = generateMock(CreateUserRequest.class).withEmail(VALID_EMAIL);
+
+        mockMvc.perform(
+                post(BASE_URI)
+                        .contentType(APPLICATION_JSON)
+                        .content(toJson(request))
+        ).andExpect(status().isCreated());
+
+        userRepository.deleteByEmail(VALID_EMAIL);
+    }
+
+    private String toJson(final Object object) throws Exception {
+        try {
+            return new ObjectMapper().writeValueAsString(object);
+        } catch (final Exception e) {
+            throw new Exception("Error to convert object to json", e);
+        }
     }
 }

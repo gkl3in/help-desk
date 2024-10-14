@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static br.com.gklein.userserviceapi.creator.CreatorUtils.generateMock;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,5 +43,17 @@ class UserControllerImplTest {
                 .andExpect(jsonPath("$.profiles").isArray());
 
         userRepository.deleteById(userId);
+    }
+
+    @Test
+    @DisplayName("Should throw a not found exception when user is not found")
+    void testFindByIdWithNotFoundException() throws Exception {
+        mockMvc.perform(get("/api/users/{id}", "123"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Object not found. Id: 123, Type: UserResponse"))
+                .andExpect(jsonPath("$.error").value(NOT_FOUND.getReasonPhrase()))
+                .andExpect(jsonPath("$.path").value("/api/users/123"))
+                .andExpect(jsonPath("$.status").value(NOT_FOUND.value()))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 }

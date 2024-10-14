@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static br.com.gklein.userserviceapi.creator.CreatorUtils.generateMock;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -21,6 +23,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class UserControllerImplTest {
+
+    public static final String BASE_URI = "/api/users";
+    public static final String UPDATE_URI = BASE_URI + "/{id}";
+    public static final String VALID_EMAIL = "kj45klj23b5@mail.com";
+    public static final String VALIDATION_EXCEPTION_MSG = "Validation Exception";
+    public static final String VALIDATION_ATTRIBUTES_ERROR_MSG = "Exception in validation attributes";
 
     @Autowired
     private MockMvc mockMvc;
@@ -55,5 +63,23 @@ class UserControllerImplTest {
                 .andExpect(jsonPath("$.path").value("/api/users/123"))
                 .andExpect(jsonPath("$.status").value(NOT_FOUND.value()))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
+
+    @Test
+    @DisplayName("Should return a list of users with success")
+    void testFindAllWithSuccess() throws Exception {
+        final var entity1 = generateMock(User.class);
+        final var entity2 = generateMock(User.class);
+
+        userRepository.saveAll(List.of(entity1, entity2));
+
+        mockMvc.perform(get(BASE_URI))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").isNotEmpty())
+                .andExpect(jsonPath("$[1]").isNotEmpty())
+                .andExpect(jsonPath("$[0].profiles").isArray());
+
+        userRepository.deleteAll(List.of(entity1, entity2));
     }
 }

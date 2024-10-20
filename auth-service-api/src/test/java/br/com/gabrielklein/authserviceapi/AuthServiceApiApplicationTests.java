@@ -1,4 +1,4 @@
-package br.com.gabrielklein.auth_service_api;
+package br.com.gabrielklein.authserviceapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

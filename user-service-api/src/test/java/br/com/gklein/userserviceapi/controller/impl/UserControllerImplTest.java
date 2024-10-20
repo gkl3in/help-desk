@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static br.com.gklein.userserviceapi.creator.CreatorUtils.generateMock;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -98,6 +99,29 @@ class UserControllerImplTest {
         ).andExpect(status().isCreated());
 
         userRepository.deleteByEmail(VALID_EMAIL);
+    }
+
+    @Test
+    @DisplayName("Should throw a conflict exception when email is invalid")
+    void testSaveUserWithConflict() throws Exception {
+        final var entity = generateMock(User.class).withEmail(VALID_EMAIL);
+
+        userRepository.save(entity);
+
+        final var request = generateMock(CreateUserRequest.class).withEmail(VALID_EMAIL);
+
+        mockMvc.perform(
+                        post(BASE_URI)
+                                .contentType(APPLICATION_JSON)
+                                .content(toJson(request))
+                ).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Email [ " + VALID_EMAIL + " ] already exists"))
+                .andExpect(jsonPath("$.error").value(CONFLICT.getReasonPhrase()))
+                .andExpect(jsonPath("$.path").value(BASE_URI))
+                .andExpect(jsonPath("$.status").value(CONFLICT.value()))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+
+        userRepository.deleteById(entity.getId());
     }
 
     private String toJson(final Object object) throws Exception {

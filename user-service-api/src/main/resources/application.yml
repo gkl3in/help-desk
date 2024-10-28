@@ -6,5 +6,3 @@ spring:
   cloud:
     config:
       uri: ${CONFIG_SERVER_URI}
-      username: ${CONFIG_SERVER_USERNAME}
-      password: ${CONFIG_SERVER_PASSWORD}

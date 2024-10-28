@@ -10,7 +10,8 @@ version = '1.0.0'
 apply from: 'gradle/plugins/dependencies.gradle'
 
 java {
-	sourceCompatibility = '17'
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.named('test') {

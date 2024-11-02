@@ -1,4 +1,4 @@
-package br.com.gklein.order_service_api;
+package br.com.gklein.orderserviceapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

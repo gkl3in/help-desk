@@ -11,6 +11,7 @@ import org.mapstruct.Named;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static models.enums.OrderStatusEnum.toEnum;
 import static org.mapstruct.NullValueCheckStrategy.ALWAYS;
 import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
@@ -30,7 +31,7 @@ public interface OrderMapper {
 
     @Named("mapStatus")
     default OrderStatusEnum mapStatus(final String status) {
-        return OrderStatusEnum.toEnum(status);
+        return toEnum(status);
     }
 
     default LocalDateTime mapCreatedAt() {

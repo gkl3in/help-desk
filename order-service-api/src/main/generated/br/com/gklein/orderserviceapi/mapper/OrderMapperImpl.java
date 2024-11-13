@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
 import models.requests.CreateOrderRequest;
+import models.requests.UpdateOrderRequest;
 import models.responses.OrderResponse;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-09T14:57:51-0300",
+    date = "2024-11-13T18:53:27-0300",
     comments = "version: 1.5.3.Final, compiler: javac, environment: Java 20.0.2.1 (Amazon.com Inc.)"
 )
 @Component
@@ -44,6 +45,31 @@ public class OrderMapperImpl implements OrderMapper {
         order.createdAt( mapCreatedAt() );
 
         return order.build();
+    }
+
+    @Override
+    public Order fromRequest(Order entity, UpdateOrderRequest request) {
+        if ( request == null ) {
+            return entity;
+        }
+
+        if ( request.status() != null ) {
+            entity.setStatus( mapStatus( request.status() ) );
+        }
+        if ( request.requesterId() != null ) {
+            entity.setRequesterId( request.requesterId() );
+        }
+        if ( request.customerId() != null ) {
+            entity.setCustomerId( request.customerId() );
+        }
+        if ( request.title() != null ) {
+            entity.setTitle( request.title() );
+        }
+        if ( request.description() != null ) {
+            entity.setDescription( request.description() );
+        }
+
+        return entity;
     }
 
     @Override

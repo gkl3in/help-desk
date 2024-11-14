@@ -25,6 +25,16 @@ public class OrderControllerImpl implements OrderController {
     private final Environment environment;
 
     @Override
+    public ResponseEntity<OrderResponse> findById(Long id) {
+        var port = environment.getProperty("local.server.port");
+        log.info("Buscando ordem de serviço pelo id: {} na porta {}", id, port);
+
+        return ResponseEntity.ok().body(
+                mapper.fromEntity(service.findById(id))
+        );
+    }
+
+    @Override
     public ResponseEntity<Void> save(CreateOrderRequest request) {
         service.save(request);
         return ResponseEntity.status(CREATED.value()).build();

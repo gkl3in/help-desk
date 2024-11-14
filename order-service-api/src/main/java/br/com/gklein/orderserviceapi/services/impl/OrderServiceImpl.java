@@ -10,7 +10,6 @@ import models.exceptions.ResourceNotFoundException;
 import models.requests.CreateOrderRequest;
 import models.requests.UpdateOrderRequest;
 import models.responses.OrderResponse;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import static java.time.LocalDateTime.now;
@@ -33,7 +32,6 @@ public class OrderServiceImpl implements OrderService {
                 ));
     }
 
-    @CacheEvict(value = "orders", allEntries = true)
     @Override
     public void save(CreateOrderRequest request) {
         final var entity = repository.save(mapper.fromRequest(request));
@@ -42,7 +40,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @CacheEvict(value = "orders", allEntries = true)
     public OrderResponse update(final Long id, UpdateOrderRequest request) {
 
         Order entity = findById(id);
@@ -53,5 +50,10 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return mapper.fromEntity(repository.save(entity));
+    }
+
+    @Override
+    public void deleteById(final Long id) {
+        repository.delete(findById(id));
     }
 }

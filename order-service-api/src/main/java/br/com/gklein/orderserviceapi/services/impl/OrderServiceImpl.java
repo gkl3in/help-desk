@@ -41,7 +41,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void save(CreateOrderRequest request) {
-        validateUserId(request.requesterId());
+        final var requester = validateUserId(request.requesterId());
+        final var customer = validateUserId(request.customerId());
+
         final var entity = repository.save(mapper.fromRequest(request));
 
         log.info("Order created: {}", entity);
@@ -82,7 +84,7 @@ public class OrderServiceImpl implements OrderService {
         return repository.findAll(pageRequest);
     }
 
-    void validateUserId(final String id) {
-        userServiceFeignClient.findById(id).getBody();
+    UserResponse validateUserId(final String id) {
+        return userServiceFeignClient.findById(id).getBody();
     }
 }

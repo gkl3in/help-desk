@@ -19,6 +19,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'mysql:mysql-connector-java:8.0.32'
     implementation 'br.com.gklein:hd-commons-lib:1.0.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'com.h2database:h2'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

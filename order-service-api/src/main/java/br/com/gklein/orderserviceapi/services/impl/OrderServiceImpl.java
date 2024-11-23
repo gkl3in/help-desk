@@ -1,5 +1,6 @@
 package br.com.gklein.orderserviceapi.services.impl;
 
+import br.com.gklein.orderserviceapi.clients.UserServiceFeignClient;
 import br.com.gklein.orderserviceapi.entities.Order;
 import br.com.gklein.orderserviceapi.mapper.OrderMapper;
 import br.com.gklein.orderserviceapi.repositories.OrderRepository;
@@ -10,6 +11,7 @@ import models.exceptions.ResourceNotFoundException;
 import models.requests.CreateOrderRequest;
 import models.requests.UpdateOrderRequest;
 import models.responses.OrderResponse;
+import models.responses.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import static models.enums.OrderStatusEnum.CLOSED;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository repository;
+    private final UserServiceFeignClient userServiceFeignClient;
     private final OrderMapper mapper;
 
     @Override
@@ -38,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void save(CreateOrderRequest request) {
+        validateUserId(request.requesterId());
         final var entity = repository.save(mapper.fromRequest(request));
 
         log.info("Order created: {}", entity);
@@ -76,5 +80,9 @@ public class OrderServiceImpl implements OrderService {
         );
 
         return repository.findAll(pageRequest);
+    }
+
+    void validateUserId(final String id) {
+        userServiceFeignClient.findById(id).getBody();
     }
 }

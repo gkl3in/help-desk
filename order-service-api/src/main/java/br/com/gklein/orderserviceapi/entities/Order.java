@@ -11,7 +11,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import static java.time.LocalDateTime.now;
 import static models.enums.OrderStatusEnum.OPEN;
 
 @Data
@@ -42,6 +41,7 @@ public class Order implements Serializable {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private OrderStatusEnum status = OPEN;
 
     private LocalDateTime createdAt;

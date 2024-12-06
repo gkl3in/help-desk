@@ -51,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("Order created: {}", entity);
 
         rabbitTemplate.convertAndSend(
-                "helpdessk",
+                "helpdesk",
                 "rk.orders.create",
                 new OrderCreatedMessage(mapper.fromEntity(entity), customer, requester)
         );

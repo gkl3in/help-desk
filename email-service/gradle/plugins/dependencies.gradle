@@ -9,7 +9,7 @@ ext {
 }
 
 dependencies {
-    implementation "br.com.valdircezar:hd-commons-lib:1.0.0"
+    implementation 'br.com.gklein:hd-commons-lib:1.0.0'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-amqp'

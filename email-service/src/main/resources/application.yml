@@ -3,3 +3,22 @@ spring:
     active: dev
   application:
     name: 'email-service'
+mail:
+  host: ${MAIL_HOST:smtp.gmail.com}
+  port: ${MAIL_PORT:587}
+  username: ${MAIL_USERNAME:gabinhoklein289@gmail.com}
+  password: ${MAIL_PASSWORD:?}
+  protocol: ${MAIL_PROTOCOL:smtp}
+  text-created-order-confirmation: |
+    Hello %s,
+    Your order has been created successfully.
+    Order details:
+    - Order ID: %s
+    - Order title: %s
+    - Order description: %s
+    - Order date: %s
+    - Order status: %s
+    - order responsible: %s
+    Thank you for shopping with us.
+    Regards,
+    The Order Management Team

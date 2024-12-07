@@ -5,11 +5,9 @@ import lombok.extern.log4j.Log4j2;
 import models.dtos.OrderCreatedMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
-import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
 
 @Log4j2
 @Service
@@ -29,6 +27,7 @@ public class EmailService {
         SimpleMailMessage message = getSimpleMailMessage(orderDTO);
         try {
             mailSender.send(message);
+            log.info("Email enviado com sucesso {}", orderDTO.getCustomer().email());
         } catch (MailException e) {
             switch (e.getClass().getSimpleName()) {
                 case "MailSendException":
@@ -62,7 +61,7 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setSubject(subject);
-        message.setTo("gabrielklein289@hotmail.com");
+        message.setTo(orderDTO.getCustomer().email());
         message.setText(text);
         return message;
     }

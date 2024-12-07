@@ -1,5 +1,6 @@
 package br.com.gkl3in.emailservice.listeners;
 
+import br.com.gkl3in.emailservice.services.EmailService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OrderListener {
 
+    private final EmailService emailService;
+
     @RabbitListener(bindings = @QueueBinding(
             exchange = @Exchange(value = "helpdesk", type = "topic"),
             value = @Queue(value = "queue.orders"),
@@ -22,5 +25,6 @@ public class OrderListener {
     ))
     public void listener(final OrderCreatedMessage message) throws MessagingException {
         log.info("Ordem de serviço recebida: {}", message);
+        emailService.sendMail(message);
     }
 }

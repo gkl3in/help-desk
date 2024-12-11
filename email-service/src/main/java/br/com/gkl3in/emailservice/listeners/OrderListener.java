@@ -11,6 +11,8 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import static br.com.gkl3in.emailservice.models.enums.OperationEnum.ORDER_CREATED;
+
 @Log4j2
 @Component
 @RequiredArgsConstructor
@@ -25,6 +27,6 @@ public class OrderListener {
     ))
     public void listener(final OrderCreatedMessage message) throws MessagingException {
         log.info("Ordem de serviço recebida: {}", message);
-        emailService.sendMail(message);
+        emailService.sendHtmlMail(message, ORDER_CREATED);
     }
 }

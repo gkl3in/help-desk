@@ -1,4 +1,4 @@
-package br.com.gkl3in.api_gateway;
+package br.com.gkl3in.apigateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

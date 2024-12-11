@@ -1,4 +1,4 @@
-package br.com.gkl3in.api_gateway;
+package br.com.gkl3in.apigateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -5,4 +5,4 @@ spring:
     name: 'email-service'
   cloud:
     config:
-      uri: ${CONFIG_SERVER_URI}
+      uri: 'config-server'

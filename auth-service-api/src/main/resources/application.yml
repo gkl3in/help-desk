@@ -5,4 +5,4 @@ spring:
     name: 'auth-service-api'
   cloud:
     config:
-      uri: ${CONFIG_SERVER_URI}
+      uri: 'config-server'

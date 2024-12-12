@@ -3,5 +3,11 @@ spring:
     active: dev
   application:
     name: 'api-gateway'
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
 server:
   port: ${SERVER_PORT:8765}

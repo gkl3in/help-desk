@@ -1,0 +1,23 @@
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://artifactory-oss.prod.netflix.net/artifactory/maven-oss-candidates' }
+}
+
+ext {
+    set('springCloudVersion', "2022.0.4")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        because('Dependência de teste')
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}

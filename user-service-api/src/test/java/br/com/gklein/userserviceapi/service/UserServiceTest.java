@@ -26,158 +26,176 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 class UserServiceTest {
 
+    private static final String VALID_USER_ID = "1";
+    private static final String MOCK_ENCODED_PASSWORD = "encoded";
+
     @InjectMocks
-    private UserService service;
+    private UserService userService;
 
     @Mock
-    private UserRepository repository;
+    private UserRepository userRepository;
 
     @Mock
-    private UserMapper mapper;
+    private UserMapper userMapper;
 
     @Mock
-    private BCryptPasswordEncoder encoder;
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Test
-    void whenCallFindByIdWithValidIdThenReturnUserResponse() {
-        when(repository.findById(anyString())).thenReturn(Optional.of(new User()));
-        when(mapper.fromEntity(any(User.class))).thenReturn(generateMock(UserResponse.class));
+    void shouldReturnUserResponseWhenFindByValidId() {
+        User mockUser = new User();
+        UserResponse expectedResponse = generateMock(UserResponse.class);
 
-        final var response = service.findById("1");
+        when(userRepository.findById(VALID_USER_ID)).thenReturn(Optional.of(mockUser));
+        when(userMapper.fromEntity(mockUser)).thenReturn(expectedResponse);
 
-        assertNotNull(response);
-        assertEquals(UserResponse.class, response.getClass());
+        UserResponse actualResponse = userService.findById(VALID_USER_ID);
 
-        verify(repository).findById(anyString());
-        verify(mapper).fromEntity(any(User.class));
+        assertNotNull(actualResponse);
+        assertEquals(UserResponse.class, actualResponse.getClass());
+        verify(userRepository).findById(VALID_USER_ID);
+        verify(userMapper).fromEntity(mockUser);
     }
 
     @Test
-    void whenCallFindByIdWithInvalidIdThenThrowResourceNotFoundException() {
-        when(repository.findById(anyString())).thenReturn(Optional.empty());
+    void shouldThrowExceptionWhenFindByInvalidId() {
+        when(userRepository.findById(VALID_USER_ID)).thenReturn(Optional.empty());
 
-        try {
-            service.findById("1");
-        } catch (Exception e) {
-            assertEquals(ResourceNotFoundException.class, e.getClass());
-            assertEquals("Object not found. Id: 1, Type: UserResponse", e.getMessage());
-        }
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> userService.findById(VALID_USER_ID)
+        );
 
-        verify(repository).findById(anyString());
-        verify(mapper, times(0)).fromEntity(any(User.class));
+        assertEquals("Object not found. Id: 1, Type: UserResponse", exception.getMessage());
+        verify(userRepository).findById(VALID_USER_ID);
+        verify(userMapper, never()).fromEntity(any());
     }
 
     @Test
-    void whenCallFindAllThenReturnListOfUserResponse() {
-        when(repository.findAll()).thenReturn(List.of(new User(), new User()));
-        when(mapper.fromEntity(any(User.class))).thenReturn(mock(UserResponse.class));
+    void shouldReturnAllUsersWhenFindAll() {
+        List<User> mockUsers = List.of(new User(), new User());
+        UserResponse mockResponse = mock(UserResponse.class);
 
-        final var response = service.findAll();
+        when(userRepository.findAll()).thenReturn(mockUsers);
+        when(userMapper.fromEntity(any(User.class))).thenReturn(mockResponse);
 
-        assertNotNull(response);
-        assertEquals(2, response.size());
-        assertEquals(UserResponse.class, response.get(0).getClass());
+        List<UserResponse> responses = userService.findAll();
 
-        verify(repository, times(1)).findAll();
-        verify(mapper, times(2)).fromEntity(any(User.class));
+        assertNotNull(responses);
+        assertEquals(2, responses.size());
+        assertEquals(UserResponse.class, responses.get(0).getClass());
+        verify(userRepository).findAll();
+        verify(userMapper, times(2)).fromEntity(any());
     }
 
     @Test
-    void whenCallSaveThenSuccess() {
-        final var request = generateMock(CreateUserRequest.class);
+    void shouldCreateUserSuccessfully() {
+        CreateUserRequest createRequest = generateMock(CreateUserRequest.class);
+        User newUser = new User();
 
-        when(mapper.fromRequest(any())).thenReturn(new User());
-        when(encoder.encode(anyString())).thenReturn("encoded");
-        when(repository.save(any(User.class))).thenReturn(new User());
-        when(repository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(userMapper.fromRequest(any())).thenReturn(newUser);
+        when(passwordEncoder.encode(anyString())).thenReturn(MOCK_ENCODED_PASSWORD);
+        when(userRepository.save(any())).thenReturn(newUser);
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
-        service.save(request);
+        userService.save(createRequest);
 
-        verify(mapper).fromRequest(request);
-        verify(encoder).encode(request.password());
-        verify(repository).save(any(User.class));
-        verify(repository).findByEmail(request.email());
+        verify(userMapper).fromRequest(createRequest);
+        verify(passwordEncoder).encode(createRequest.password());
+        verify(userRepository).save(any());
+        verify(userRepository).findByEmail(createRequest.email());
     }
 
     @Test
-    void whenCallSaveWithInvalidEmailThenThrowDataIntegrityViolationException() {
-        final var request = generateMock(CreateUserRequest.class);
-        final var entity = generateMock(User.class);
+    void shouldThrowExceptionWhenCreateUserWithExistingEmail() {
+        CreateUserRequest createRequest = generateMock(CreateUserRequest.class);
+        User existingUser = generateMock(User.class);
 
-        when(repository.findByEmail(anyString())).thenReturn(Optional.of(entity));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(existingUser));
 
-        try {
-            service.save(request);
-        } catch (Exception e) {
-            assertEquals(DataIntegrityViolationException.class, e.getClass());
-            assertEquals("Email [ " + request.email() + " ] already exists", e.getMessage());
-        }
+        DataIntegrityViolationException exception = assertThrows(
+                DataIntegrityViolationException.class,
+                () -> userService.save(createRequest)
+        );
 
-        verify(repository).findByEmail(request.email());
-        verify(mapper, times(0)).fromRequest(request);
-        verify(encoder, times(0)).encode(request.password());
-        verify(repository, times(0)).save(any(User.class));
+        assertEquals("Email [ " + createRequest.email() + " ] already exists", exception.getMessage());
+        verifyNoUserCreationCalls(createRequest);
     }
 
     @Test
-    void whenCallUpdateWithInvalidIdThenThrowResourceNotFoundException() {
-        final var request = generateMock(UpdateUserRequest.class);
+    void shouldUpdateUserSuccessfully() {
+        UpdateUserRequest updateRequest = generateMock(UpdateUserRequest.class);
+        User existingUser = generateMock(User.class).withId(VALID_USER_ID);
 
-        when(repository.findById(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findById(VALID_USER_ID)).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(existingUser));
+        when(userMapper.update(any(), any())).thenReturn(existingUser);
+        when(userRepository.save(any())).thenReturn(existingUser);
 
-        try {
-            service.update("1", request);
-        } catch (Exception e) {
-            assertEquals(ResourceNotFoundException.class, e.getClass());
-            assertEquals("Object not found. Id: 1, Type: UserResponse", e.getMessage());
-        }
+        userService.update(VALID_USER_ID, updateRequest);
 
-        verify(repository).findById(anyString());
-        verify(mapper, times(0)).update(any(), any());
-        verify(encoder, times(0)).encode(request.password());
-        verify(repository, times(0)).save(any(User.class));
+        verifyUpdateOperationCalls(updateRequest, existingUser);
     }
 
     @Test
-    void whenCallUpdateWithInvalidEmailThenThrowDataIntegrityViolationException() {
-        final var request = generateMock(UpdateUserRequest.class);
-        final var entity = generateMock(User.class);
+    void shouldThrowExceptionWhenUpdateNonexistentUser() {
+        UpdateUserRequest updateRequest = generateMock(UpdateUserRequest.class);
+        when(userRepository.findById(VALID_USER_ID)).thenReturn(Optional.empty());
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(entity));
-        when(repository.findByEmail(anyString())).thenReturn(Optional.of(entity));
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> userService.update(VALID_USER_ID, updateRequest)
+        );
 
-        try {
-            service.update("1", request);
-        } catch (Exception e) {
-            assertEquals(DataIntegrityViolationException.class, e.getClass());
-            assertEquals("Email [ " + request.email() + " ] already exists", e.getMessage());
-        }
-
-        verify(repository).findById(anyString());
-        verify(repository).findByEmail(request.email());
-        verify(mapper, times(0)).update(any(), any());
-        verify(encoder, times(0)).encode(request.password());
-        verify(repository, times(0)).save(any(User.class));
+        assertEquals("Object not found. Id: 1, Type: UserResponse", exception.getMessage());
+        verifyNoUpdateCalls(updateRequest);
     }
 
     @Test
-    void whenCallUpdateWithValidParamsThenGetSuccess() {
-        final var id = "1";
-        final var request = generateMock(UpdateUserRequest.class);
-        final var entity = generateMock(User.class).withId(id);
+    void shouldThrowExceptionWhenUpdateWithDuplicateEmail() {
+        UpdateUserRequest updateRequest = generateMock(UpdateUserRequest.class);
+        User existingUser = generateMock(User.class);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(entity));
-        when(repository.findByEmail(anyString())).thenReturn(Optional.of(entity));
-        when(mapper.update(any(), any())).thenReturn(entity);
-        when(repository.save(any(User.class))).thenReturn(entity);
+        when(userRepository.findById(VALID_USER_ID)).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(existingUser));
 
-        service.update(id, request);
+        DataIntegrityViolationException exception = assertThrows(
+                DataIntegrityViolationException.class,
+                () -> userService.update(VALID_USER_ID, updateRequest)
+        );
 
-        verify(repository).findById(anyString());
-        verify(repository).findByEmail(request.email());
-        verify(mapper).update(request, entity);
-        verify(encoder).encode(request.password());
-        verify(repository).save(any(User.class));
-        verify(mapper).fromEntity(any(User.class));
+        assertEquals("Email [ " + updateRequest.email() + " ] already exists", exception.getMessage());
+        verifyNoDuplicateEmailUpdateCalls(updateRequest);
+    }
+
+    private void verifyNoUserCreationCalls(CreateUserRequest request) {
+        verify(userRepository).findByEmail(request.email());
+        verify(userMapper, never()).fromRequest(any());
+        verify(passwordEncoder, never()).encode(any());
+        verify(userRepository, never()).save(any());
+    }
+
+    private void verifyUpdateOperationCalls(UpdateUserRequest request, User entity) {
+        verify(userRepository).findById(VALID_USER_ID);
+        verify(userRepository).findByEmail(request.email());
+        verify(userMapper).update(request, entity);
+        verify(passwordEncoder).encode(request.password());
+        verify(userRepository).save(any());
+        verify(userMapper).fromEntity(any());
+    }
+
+    private void verifyNoUpdateCalls(UpdateUserRequest request) {
+        verify(userRepository).findById(VALID_USER_ID);
+        verify(userMapper, never()).update(any(), any());
+        verify(passwordEncoder, never()).encode(request.password());
+        verify(userRepository, never()).save(any());
+    }
+
+    private void verifyNoDuplicateEmailUpdateCalls(UpdateUserRequest request) {
+        verify(userRepository).findById(VALID_USER_ID);
+        verify(userRepository).findByEmail(request.email());
+        verify(userMapper, never()).update(any(), any());
+        verify(passwordEncoder, never()).encode(request.password());
+        verify(userRepository, never()).save(any());
     }
 }

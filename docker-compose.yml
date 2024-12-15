@@ -41,20 +41,23 @@ services:
     networks:
       - helpdesk
 
-#  config-server:
-#    image: 'gabinhokleinn/helpdesk-config-server'
-#    container_name: 'config-server'
-#    environment:
-#      - CONFIG_SERVER_URI=https://github.com/gkl3in/help-desk-configs
-#      - CONFIG_SERVER_USERNAME=gkl3in
-#      - CONFIG_SERVER_PASSWORD=?
-#      - PORT=8888
-#    ports:
-#      - "8888:8888"
-#    expose:
-#      - 8888
-#    networks:
-#      - helpdesk
+  config-server:
+    image: 'gabinhokleinn/helpdesk-config-server'
+    container_name: 'config-server'
+    environment:
+      - EUREKA_URI=http://service-discovery:8761/eureka
+      - CONFIG_SERVER_URI=https://github.com/gkl3in/help-desk-configs
+      - CONFIG_SERVER_USERNAME=gkl3in
+      - CONFIG_SERVER_PASSWORD=?
+      - PORT=8888
+    ports:
+      - "8888:8888"
+    expose:
+      - 8888
+    depends_on:
+      - service-discovery
+    networks:
+      - helpdesk
 
 networks:
   helpdesk:

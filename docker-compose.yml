@@ -15,49 +15,54 @@ services:
 
 
   service-discovery:
-    image: 'gabinhokleinn/helpdesk-service-discovery'
     container_name: 'service-discovery'
-    environment:
-      - PORT=8761
+    build:
+      context: ./service-discovery
+      dockerfile: Dockerfile
     ports:
       - "8761:8761"
     expose:
       - 8761
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://service-discovery:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - helpdesk
 
-  api-gateway:
-    image: 'gabinhokleinn/helpdesk-api-gateway'
-    container_name: 'api-gateway'
-    environment:
-      - SERVER_PORT=8765
-      - EUREKA_URI=http://service-discovery:8761/eureka
-    ports:
-      - "8765:8765"
-    expose:
-      - 8765
-    depends_on:
-      - service-discovery
-    networks:
-      - helpdesk
-
-  config-server:
-    image: 'gabinhokleinn/helpdesk-config-server'
-    container_name: 'config-server'
-    environment:
-      - EUREKA_URI=http://service-discovery:8761/eureka
-      - CONFIG_SERVER_URI=https://github.com/gkl3in/help-desk-configs
-      - CONFIG_SERVER_USERNAME=gkl3in
-      - CONFIG_SERVER_PASSWORD=?
-      - PORT=8888
-    ports:
-      - "8888:8888"
-    expose:
-      - 8888
-    depends_on:
-      - service-discovery
-    networks:
-      - helpdesk
+#  api-gateway:
+#    image: 'gabinhokleinn/helpdesk-api-gateway'
+#    container_name: 'api-gateway'
+#    environment:
+#      - SERVER_PORT=8765
+#      - EUREKA_URI=http://service-discovery:8761/eureka
+#    ports:
+#      - "8765:8765"
+#    expose:
+#      - 8765
+#    depends_on:
+#      - service-discovery
+#    networks:
+#      - helpdesk
+#
+#  config-server:
+#    image: 'gabinhokleinn/helpdesk-config-server'
+#    container_name: 'config-server'
+#    environment:
+#      - EUREKA_URI=http://service-discovery:8761/eureka
+#      - CONFIG_SERVER_URI=https://github.com/gkl3in/help-desk-configs
+#      - CONFIG_SERVER_USERNAME=gkl3in
+#      - CONFIG_SERVER_PASSWORD=?
+#      - PORT=8888
+#    ports:
+#      - "8888:8888"
+#    expose:
+#      - 8888
+#    depends_on:
+#      - service-discovery
+#    networks:
+#      - helpdesk
 
 networks:
   helpdesk:

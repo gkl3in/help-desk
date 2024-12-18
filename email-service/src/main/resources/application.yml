@@ -1,8 +1,5 @@
 spring:
   profiles:
-    active: dev
+    active: ${PROFILE_ACTIVE:dev}
   application:
     name: 'email-service'
-  cloud:
-    config:
-      uri: 'config-server'

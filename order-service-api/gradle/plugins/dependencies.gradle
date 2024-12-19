@@ -9,6 +9,7 @@ ext {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     // Starter para integração com o RabbitMQ
     implementation'org.springframework.boot:spring-boot-starter-amqp'

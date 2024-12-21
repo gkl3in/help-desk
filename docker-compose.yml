@@ -67,6 +67,7 @@ services:
       context: ./api-gateway
       dockerfile: Dockerfile
     environment:
+      - PROFILE_ACTIVE=dev
       - SERVER_PORT=8765
       - EUREKA_URI=http://service-discovery:8761/eureka
       - CONFIG_SERVER_URI=http://config-server:8888

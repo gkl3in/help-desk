@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
-        name = "auth-service-api",
+        name = "localhost:8765/auth-service-api", // TODO: Change this to the correct service name
         path = "/api/auth"
 )
 public interface AuthFeignClient {

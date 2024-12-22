@@ -19,3 +19,4 @@ springdoc:
     version: '1.0.0'
 server:
   port: ${PORT:0}
+jwt.secret: 'nkKyXiPxGUTa/sdQDAkMKnoYX0nIFzjYGO8tBisYkN3VxGcgLqZtMBUnqPcEzqAKF+rH8Y/KgSmBXr4NA8RxrDosLafxs2eEtqx0CszlbLE='

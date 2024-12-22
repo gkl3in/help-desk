@@ -1,4 +1,4 @@
-package security;
+package br.com.gklein.helpdeskbff.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;

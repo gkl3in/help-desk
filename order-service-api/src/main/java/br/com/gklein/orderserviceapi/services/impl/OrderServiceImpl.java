@@ -14,6 +14,8 @@ import models.requests.UpdateOrderRequest;
 import models.responses.OrderResponse;
 import models.responses.UserResponse;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper mapper;
     private final RabbitTemplate rabbitTemplate;
 
+    @Cacheable(value = "orders", key = "#id")
     @Override
     public Order findById(final Long id) {
         return repository
@@ -42,6 +45,7 @@ public class OrderServiceImpl implements OrderService {
                 ));
     }
 
+    @CacheEvict(value = "orders", allEntries = true)
     @Override
     public void save(CreateOrderRequest request) {
         final var requester = validateUserId(request.requesterId());
@@ -57,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
         );
     }
 
+    @CacheEvict(value = "orders", allEntries = true)
     @Override
     public OrderResponse update(final Long id, UpdateOrderRequest request) {
         validateUsers(request);
@@ -71,16 +76,19 @@ public class OrderServiceImpl implements OrderService {
         return mapper.fromEntity(repository.save(entity));
     }
 
+    @CacheEvict(value = "orders", allEntries = true)
     @Override
     public void deleteById(final Long id) {
         repository.delete(findById(id));
     }
 
+    @Cacheable(value = "orders")
     @Override
     public List<Order> findAll() {
         return repository.findAll();
     }
 
+    @Cacheable(value = "orders", key = "#page + '-' + #linesPerPage + '-' + #direction + '-' + #orderBy")
     @Override
     public Page<Order> findAllPaginated(Integer page, Integer linesPerPage, String direction, String orderBy) {
         PageRequest pageRequest = PageRequest.of(

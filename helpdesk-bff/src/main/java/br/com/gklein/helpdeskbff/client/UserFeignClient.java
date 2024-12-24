@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @FeignClient(
-        name = "localhost:8765/user-service-api", // TODO: Change this to the correct service name
+        name = "user-service-api", // TODO: Change this to the correct service name
         path = "/api/users"
 )
 public interface UserFeignClient {

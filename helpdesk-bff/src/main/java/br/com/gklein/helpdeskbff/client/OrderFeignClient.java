@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @FeignClient(
-        name = "localhost:8765/order-service-api", // TODO: Change this to the correct service name
+        name = "order-service-api", // TODO: Change this to the correct service name
         path = "/api/orders"
 )
 public interface OrderFeignClient {

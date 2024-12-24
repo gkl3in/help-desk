@@ -6,6 +6,11 @@ spring:
   cloud:
     config:
       uri: 'config-server'
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      connect-timeout: 10000
 eureka:
   client:
     serviceUrl:
@@ -18,5 +23,5 @@ springdoc:
     description: 'Component responsible for aggregating the microservices of the Helpdesk system'
     version: '1.0.0'
 server:
-  port: ${PORT:0}
+  port: ${PORT:8080}
 jwt.secret: 'nkKyXiPxGUTa/sdQDAkMKnoYX0nIFzjYGO8tBisYkN3VxGcgLqZtMBUnqPcEzqAKF+rH8Y/KgSmBXr4NA8RxrDosLafxs2eEtqx0CszlbLE='

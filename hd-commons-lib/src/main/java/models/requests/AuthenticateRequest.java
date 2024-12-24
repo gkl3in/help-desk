@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 public record AuthenticateRequest(
 
-        @Schema(description = "User email", example = "gabriel.klein@mail.com")
+        @Schema(description = "User email", example = "gabrielklein289@hotmail.com")
         @Email(message = "Invalid email")
         @NotBlank(message = "Email cannot be empty")
         @Size(min = 6, max = 50, message = "Email must contain between 6 and 50 characters")

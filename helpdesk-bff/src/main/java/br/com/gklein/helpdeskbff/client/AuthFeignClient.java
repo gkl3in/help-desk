@@ -1,5 +1,6 @@
 package br.com.gklein.helpdeskbff.client;
 
+import br.com.gklein.helpdeskbff.config.FeignConfig;
 import jakarta.validation.Valid;
 import models.requests.AuthenticateRequest;
 import models.requests.RefreshTokenRequest;
@@ -11,8 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
-        name = "auth-service-api", // TODO: Change this to the correct service name
-        path = "/api/auth"
+        name = "auth-service-api",
+        path = "/api/auth",
+        configuration = FeignConfig.class
 )
 public interface AuthFeignClient {
 

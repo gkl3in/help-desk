@@ -17,6 +17,7 @@ services:
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
       - helpdesk
+    restart: always
 
 
   service-discovery:
@@ -35,6 +36,7 @@ services:
       retries: 3
     networks:
       - helpdesk
+    restart: always
 
   config-server:
     container_name: 'config-server'
@@ -60,6 +62,7 @@ services:
         condition: service_healthy
     networks:
       - helpdesk
+    restart: always
 
   api-gateway:
     container_name: 'api-gateway'
@@ -87,6 +90,7 @@ services:
         condition: service_healthy
     networks:
       - helpdesk
+    restart: always
 
   auth-service-api:
     container_name: 'auth-service-api'
@@ -104,6 +108,7 @@ services:
         condition: service_healthy
     networks:
       - helpdesk
+    restart: always
 
   email-service:
     container_name: 'email-service'
@@ -127,6 +132,7 @@ services:
         condition: service_healthy
     networks:
       - helpdesk
+    restart: always
 
   user-service-api:
     container_name: 'user-service-api'
@@ -144,6 +150,7 @@ services:
         condition: service_healthy
     networks:
       - helpdesk
+    restart: always
 
   order-service-api:
     container_name: 'order-service-api'
@@ -170,6 +177,7 @@ services:
         condition: service_healthy
     networks:
       - helpdesk
+    restart: always
 
   redis:
     container_name: 'redis'
@@ -184,6 +192,7 @@ services:
       - redis_data:/data
     networks:
       - helpdesk
+    restart: always
 
   helpdesk-bff:
     container_name: 'helpdesk-bff'
@@ -209,6 +218,7 @@ services:
       - 8080
     networks:
       - helpdesk
+    restart: always
 
 networks:
   helpdesk:

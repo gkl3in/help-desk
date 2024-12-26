@@ -1,5 +1,6 @@
 package br.com.gklein.helpdeskbff.client;
 
+import br.com.gklein.helpdeskbff.config.FeignConfig;
 import jakarta.validation.Valid;
 import models.requests.CreateOrderRequest;
 import models.requests.UpdateOrderRequest;
@@ -12,8 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @FeignClient(
-        name = "order-service-api", // TODO: Change this to the correct service name
-        path = "/api/orders"
+        name = "order-service-api",
+        path = "/api/orders",
+        configuration = FeignConfig.class
 )
 public interface OrderFeignClient {
     @GetMapping("/{id}")

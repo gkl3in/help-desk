@@ -1,6 +1,7 @@
 package br.com.gklein.helpdeskbff.controller.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
+import models.exceptions.GenericFeignException;
 import models.exceptions.ResourceNotFoundException;
 import models.exceptions.StandardError;
 import models.exceptions.ValidationException;
@@ -12,12 +13,20 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import static java.time.LocalDateTime.now;
 import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
+
+    @ExceptionHandler(GenericFeignException.class)
+    ResponseEntity<Map> handleGenericFeignException(
+            final GenericFeignException ex
+    ) {
+        return ResponseEntity.status(ex.getStatus()).body(ex.getError());
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     ResponseEntity<StandardError> handleNotFoundException(
